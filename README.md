@@ -1,28 +1,21 @@
-# Wikipedia Summary Search
+# Wikipedia Search (with History)
 
 ## Overview
-A minimal single-page web app to fetch and display a topic’s title, summary, and thumbnail image from the Wikipedia REST API.
+A simple, client-side Wikipedia search app that displays results in Bootstrap cards and keeps a clickable history of your last 5 unique searches. You can also clear your history with one click.
 
 ## Setup
-- Option 1: Open index.html directly in your browser.
-- Option 2 (recommended for best compatibility): Serve locally
-  - Python 3: python -m http.server 8000
-  - Then open http://localhost:8000
+- Download the repository (or this single file).
+- Open index.html in any modern web browser.
 
-No build step or dependencies required.
+No build step or API keys required.
 
 ## Usage
-- Enter a topic (e.g., “Ada Lovelace”) and click Search or press Enter.
-- The page shows the Wikipedia title, a short summary (extract), and a thumbnail image if available.
-- If the topic is not found or an error occurs, a helpful message is displayed.
+- Type a topic in the search box and press Search.
+- Click any item in the Search History to re-run that search.
+- Use the Clear button to remove all history.
+- Click “Read on Wikipedia” to open the full article in a new tab.
 
-## License
-MIT License
-
-Copyright (c) 2025
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+## Improvements from previous version (Round 2)
+- Added a history panel that lists the last 5 searched topics (clickable to re-run searches).
+- Added a Clear History button to remove saved topics.
+- Improved UI with Bootstrap cards and polished layout.
