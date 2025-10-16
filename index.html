@@ -1,348 +1,251 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>Wikipedia Summary Search</title>
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Wikipedia Search with History</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
-    :root {
-      --bg: #0f172a;
-      --panel: #111827;
-      --text: #e5e7eb;
-      --muted: #9ca3af;
-      --accent: #22c55e;
-      --accent-2: #16a34a;
-      --danger: #ef4444;
-      --border: #1f2937;
-      --link: #60a5fa;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-      background: radial-gradient(1200px 600px at 50% -50%, #1a2e24, #0f172a);
-      color: var(--text);
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
-      padding: 24px;
-    }
-    .app {
-      width: min(880px, 100%);
-      background: color-mix(in oklab, var(--panel) 85%, transparent);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.03) inset;
-      overflow: clip;
-    }
-    header {
-      padding: 18px 20px;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      border-bottom: 1px solid var(--border);
-      background: linear-gradient(0deg, rgba(255,255,255,0.02), rgba(255,255,255,0.02));
-    }
-    header .brand {
-      width: 32px; height: 32px;
-      border-radius: 8px;
-      display: grid; place-items: center;
-      color: white;
-      background: conic-gradient(from 200deg at 60% 40%, #34d399, #22c55e, #16a34a, #34d399);
-      box-shadow: 0 2px 8px rgba(34,197,94,0.35);
-      font-weight: 800;
-      font-size: 16px;
-      letter-spacing: -0.02em;
-    }
-    header h1 {
-      margin: 0;
-      font-size: 18px;
-      letter-spacing: -0.01em;
-    }
-    header p {
-      margin: 0;
-      font-size: 13px;
-      color: var(--muted);
-    }
-    .controls {
-      padding: 16px 20px;
-      display: grid;
-      gap: 12px;
-      border-bottom: 1px solid var(--border);
-      background: rgba(255,255,255,0.01);
-    }
-    form {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 10px;
-    }
-    input[type="text"] {
-      width: 100%;
-      padding: 12px 14px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: #0b1220;
-      color: var(--text);
-      outline: none;
-      font-size: 16px;
-      transition: border-color .15s, box-shadow .15s;
-    }
-    input[type="text"]::placeholder { color: #6b7280; }
-    input[type="text"]:focus {
-      border-color: color-mix(in oklab, var(--accent) 60%, #0b1220);
-      box-shadow: 0 0 0 4px rgba(34,197,94,0.12);
-    }
-    button {
-      padding: 12px 16px;
-      border-radius: 10px;
-      border: 1px solid color-mix(in oklab, var(--accent) 30%, #0b1220);
-      background: linear-gradient(180deg, var(--accent), var(--accent-2));
-      color: white;
-      font-weight: 600;
-      font-size: 15px;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      transition: transform .03s ease, filter .2s ease, box-shadow .2s ease;
-      box-shadow: 0 6px 14px rgba(34,197,94,0.25), 0 0 0 1px rgba(255,255,255,0.05) inset;
-    }
-    button:hover { filter: brightness(1.03); }
-    button:active { transform: translateY(1px); }
-    button:disabled {
-      filter: grayscale(0.3) brightness(0.85);
-      cursor: not-allowed;
-      box-shadow: none;
-    }
-    .status {
-      min-height: 20px;
-      font-size: 14px;
-      color: var(--muted);
-    }
-    .results {
-      padding: 18px 20px 24px;
-    }
-    .card {
-      display: grid;
-      grid-template-columns: 140px 1fr;
-      gap: 16px;
-      align-items: start;
-      padding: 16px;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      background: rgba(255,255,255,0.02);
-    }
-    .thumb {
-      width: 140px;
-      aspect-ratio: 1/1;
-      border-radius: 10px;
-      overflow: hidden;
-      background: #0b1220;
-      border: 1px solid var(--border);
-      display: grid;
-      place-items: center;
-      color: var(--muted);
-      font-size: 12px;
-      text-align: center;
-      padding: 6px;
-    }
-    .thumb img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-    .content h2 {
-      margin: 0 0 8px;
-      font-size: 22px;
-      letter-spacing: -0.01em;
-    }
-    .content p {
-      margin: 0;
-      line-height: 1.55;
-      color: #d1d5db;
-    }
-    .tips {
-      margin-top: 10px;
-      font-size: 12px;
-      color: var(--muted);
-    }
-    .error {
-      color: #fecaca;
-    }
-    .footer {
-      padding: 14px 20px;
-      border-top: 1px solid var(--border);
-      font-size: 12px;
-      color: var(--muted);
-      display: flex;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 10px;
-      background: rgba(255,255,255,0.01);
-    }
-    .footer a { color: var(--link); text-decoration: none; }
-    .footer a:hover { text-decoration: underline; }
-    @media (max-width: 640px) {
-      .card { grid-template-columns: 1fr; }
-      .thumb { width: 100%; aspect-ratio: 16/9; }
-      header { flex-wrap: wrap; gap: 6px 12px; }
-    }
+    body { background: #f8f9fa; }
+    .search-card { position: sticky; top: 1rem; z-index: 100; }
+    .snippet { color: #495057; }
+    .results-card { border: none; }
+    .results-card .card-body { padding-bottom: 0.75rem; }
+    .history-item-btn { text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   </style>
 </head>
 <body>
-  <main class="app" role="main">
-    <header>
-      <div class="brand" aria-hidden="true">W</div>
-      <div>
-        <h1>Wikipedia Summary Search</h1>
-        <p>Fetch a concise topic summary, title, and thumbnail from Wikipedia.</p>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+      <span class="navbar-brand">Wikipedia Search</span>
+    </div>
+  </nav>
+
+  <main class="container my-4">
+    <div class="row g-4">
+      <div class="col-lg-8">
+        <div class="card shadow-sm search-card">
+          <div class="card-body">
+            <form id="searchForm" class="row g-2 align-items-center">
+              <div class="col-sm-9 col-12">
+                <label for="searchInput" class="form-label mb-1">Search Wikipedia</label>
+                <input id="searchInput" type="text" class="form-control form-control-lg" placeholder="e.g., JavaScript, SpaceX, Marie Curie" required />
+              </div>
+              <div class="col-sm-3 col-12 d-grid">
+                <button class="btn btn-primary btn-lg mt-sm-4 mt-2" type="submit">Search</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <div id="resultsHeader" class="d-none mb-2">
+            <h5 class="mb-0">Results</h5>
+            <small id="resultsMeta" class="text-muted"></small>
+          </div>
+          <div id="resultsContainer" class="d-grid gap-3"></div>
+          <div id="emptyState" class="text-center text-muted mt-4">
+            <p class="mb-1">Start by searching a topic above.</p>
+            <small>Tip: Click a topic in your history to quickly search again.</small>
+          </div>
+        </div>
       </div>
-    </header>
 
-    <section class="controls">
-      <form id="searchForm" novalidate>
-        <input
-          id="topicInput"
-          type="text"
-          name="topic"
-          placeholder="Try: Ada Lovelace, Artificial intelligence, Japan..."
-          autocomplete="off"
-          aria-label="Topic to search on Wikipedia"
-          required
-        />
-        <button id="searchBtn" type="submit" aria-label="Search Wikipedia">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M21 21l-4.2-4.2M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z" stroke="white" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-          Search
-        </button>
-      </form>
-      <div id="status" class="status" role="status" aria-live="polite"></div>
-    </section>
-
-    <section class="results">
-      <div id="results"></div>
-      <div class="tips">Tip: Use specific terms for better results. Press Enter to search.</div>
-    </section>
-
-    <div class="footer">
-      <span>Data by Wikipedia REST API</span>
-      <span>This project is licensed under the MIT License.</span>
+      <div class="col-lg-4">
+        <div class="card shadow-sm">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <span>Search History</span>
+            <button id="clearHistoryBtn" type="button" class="btn btn-sm btn-outline-danger">Clear</button>
+          </div>
+          <div class="card-body p-0">
+            <ul id="historyList" class="list-group list-group-flush">
+              <!-- History items inserted here -->
+            </ul>
+            <div id="noHistory" class="p-3 text-muted text-center">No recent topics.</div>
+          </div>
+          <div class="card-footer">
+            <small class="text-muted">Shows your last 5 unique searches.</small>
+          </div>
+        </div>
+      </div>
     </div>
   </main>
 
+  <footer class="container my-4 text-center text-muted">
+    <small>Results via Wikipedia API</small>
+  </footer>
+
   <script>
-    (function () {
-      const form = document.getElementById('searchForm');
-      const input = document.getElementById('topicInput');
-      const results = document.getElementById('results');
-      const status = document.getElementById('status');
-      const button = document.getElementById('searchBtn');
+    const API_URL = 'https://en.wikipedia.org/w/api.php?origin=*&action=query&list=search&format=json&srprop=snippet&utf8=1&srlimit=10&srsearch=';
 
-      function setStatus(message, isError = false) {
-        status.textContent = message || '';
-        status.classList.toggle('error', !!isError);
+    const searchForm = document.getElementById('searchForm');
+    const searchInput = document.getElementById('searchInput');
+    const resultsContainer = document.getElementById('resultsContainer');
+    const resultsHeader = document.getElementById('resultsHeader');
+    const resultsMeta = document.getElementById('resultsMeta');
+    const emptyState = document.getElementById('emptyState');
+
+    const historyList = document.getElementById('historyList');
+    const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+    const noHistory = document.getElementById('noHistory');
+
+    let history = loadHistory();
+
+    function loadHistory() {
+      try {
+        const raw = localStorage.getItem('wikiHistory');
+        return raw ? JSON.parse(raw) : [];
+      } catch {
+        return [];
       }
+    }
 
-      function clearResults() {
-        results.innerHTML = '';
+    function saveHistory() {
+      localStorage.setItem('wikiHistory', JSON.stringify(history));
+    }
+
+    function renderHistory() {
+      historyList.innerHTML = '';
+      if (!history.length) {
+        noHistory.classList.remove('d-none');
+      } else {
+        noHistory.classList.add('d-none');
       }
-
-      function renderResult(data) {
-        clearResults();
-
-        const card = document.createElement('article');
-        card.className = 'card';
-
-        const thumb = document.createElement('div');
-        thumb.className = 'thumb';
-
-        const imgUrl = data?.thumbnail?.source || data?.thumbnail?.url || data?.originalimage?.source || null;
-        if (imgUrl) {
-          const img = document.createElement('img');
-          img.src = imgUrl;
-          img.alt = data.title ? `Thumbnail for ${data.title}` : 'Thumbnail';
-          img.loading = 'lazy';
-          thumb.appendChild(img);
-        } else {
-          thumb.textContent = 'No image available';
-        }
-
-        const content = document.createElement('div');
-        content.className = 'content';
-
-        const title = document.createElement('h2');
-        title.textContent = data.title || 'Untitled';
-
-        const extract = document.createElement('p');
-        extract.textContent = data.extract || 'No summary available.';
-
-        content.appendChild(title);
-        content.appendChild(extract);
-
-        card.appendChild(thumb);
-        card.appendChild(content);
-
-        results.appendChild(card);
-      }
-
-      async function fetchSummary(topic) {
-        const url = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(topic)}`;
-        const res = await fetch(url, {
-          headers: { 'Accept': 'application/json' }
+      history.slice(0, 5).forEach(term => {
+        const li = document.createElement('li');
+        li.className = 'list-group-item p-0';
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'btn btn-link w-100 text-start history-item-btn px-3 py-2';
+        btn.textContent = term;
+        btn.title = term;
+        btn.addEventListener('click', () => {
+          searchInput.value = term;
+          performSearch(term);
+          addToHistory(term); // move to front
         });
-
-        // Wikipedia REST API returns 404 for not_found
-        const data = await res.json().catch(() => ({}));
-
-        if (!res.ok) {
-          const msg = data?.detail || data?.title || res.statusText || 'Request failed';
-          const friendly = res.status === 404 ? 'Topic not found on Wikipedia.' : msg;
-          const error = new Error(friendly);
-          error.status = res.status;
-          error.apiMessage = msg;
-          throw error;
-        }
-        return data;
-      }
-
-      async function handleSearch(e) {
-        e.preventDefault();
-        const topic = (input.value || '').trim();
-        if (!topic) {
-          setStatus('Please enter a topic to search.', true);
-          clearResults();
-          return;
-        }
-
-        setStatus('Searching Wikipedia…');
-        button.disabled = true;
-
-        try {
-          const data = await fetchSummary(topic);
-          renderResult(data);
-          const typeHint = data?.type === 'disambiguation' ? ' (disambiguation)' : '';
-          setStatus(`Showing results for “${data.title || topic}”${typeHint}.`);
-        } catch (err) {
-          clearResults();
-          setStatus(err?.message || 'An unexpected error occurred.', true);
-        } finally {
-          button.disabled = false;
-        }
-      }
-
-      form.addEventListener('submit', handleSearch);
-      // Allow Enter to trigger search even if focus is elsewhere inside form
-      input.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-          form.requestSubmit();
-        }
+        li.appendChild(btn);
+        historyList.appendChild(li);
       });
+      clearHistoryBtn.disabled = history.length === 0;
+    }
 
-      // Optional: focus input on load
-      window.addEventListener('DOMContentLoaded', () => input.focus());
-    })();
+    function addToHistory(term) {
+      term = term.trim();
+      if (!term) return;
+      // Remove if exists and add to front
+      history = [term, ...history.filter(t => t.toLowerCase() !== term.toLowerCase())];
+      // Limit to 5
+      history = history.slice(0, 5);
+      saveHistory();
+      renderHistory();
+    }
+
+    async function performSearch(query) {
+      const q = query.trim();
+      if (!q) return;
+
+      resultsHeader.classList.remove('d-none');
+      emptyState.classList.add('d-none');
+      resultsMeta.textContent = 'Searching…';
+      resultsContainer.innerHTML = `
+        <div class="card results-card shadow-sm">
+          <div class="card-body">
+            <div class="placeholder-glow">
+              <span class="placeholder col-7"></span>
+              <span class="placeholder col-4"></span>
+              <span class="placeholder col-4"></span>
+              <span class="placeholder col-6"></span>
+              <span class="placeholder col-8"></span>
+            </div>
+          </div>
+        </div>
+      `;
+
+      try {
+        const res = await fetch(API_URL + encodeURIComponent(q));
+        if (!res.ok) throw new Error('Network error');
+        const data = await res.json();
+        const results = (data?.query?.search) || [];
+
+        resultsMeta.textContent = `${results.length} result(s) for "${q}"`;
+        renderResults(results);
+      } catch (err) {
+        resultsMeta.textContent = 'Error fetching results.';
+        resultsContainer.innerHTML = `
+          <div class="alert alert-danger" role="alert">
+            Something went wrong. Please try again.
+          </div>
+        `;
+      }
+    }
+
+    function renderResults(results) {
+      resultsContainer.innerHTML = '';
+      if (!results.length) {
+        resultsContainer.innerHTML = `
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <p class="mb-0">No results found. Try a different query.</p>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      results.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'card shadow-sm results-card';
+
+        const body = document.createElement('div');
+        body.className = 'card-body';
+
+        const title = document.createElement('h5');
+        title.className = 'card-title mb-1';
+        title.textContent = item.title;
+
+        const snippet = document.createElement('p');
+        snippet.className = 'card-text snippet';
+        snippet.innerHTML = item.snippet + '…';
+
+        const link = document.createElement('a');
+        link.href = `https://en.wikipedia.org/?curid=${item.pageid}`;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        link.className = 'btn btn-outline-primary btn-sm mt-2';
+        link.textContent = 'Read on Wikipedia';
+
+        body.appendChild(title);
+        body.appendChild(snippet);
+        body.appendChild(link);
+        card.appendChild(body);
+        resultsContainer.appendChild(card);
+      });
+    }
+
+    searchForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const term = searchInput.value.trim();
+      if (!term) return;
+      addToHistory(term);
+      performSearch(term);
+    });
+
+    clearHistoryBtn.addEventListener('click', () => {
+      if (!history.length) return;
+      history = [];
+      saveHistory();
+      renderHistory();
+    });
+
+    // Initial render
+    renderHistory();
+
+    // Optional: If there is history, show last searched results immediately
+    if (history.length) {
+      searchInput.value = history[0];
+      performSearch(history[0]);
+    }
   </script>
 </body>
 </html>
